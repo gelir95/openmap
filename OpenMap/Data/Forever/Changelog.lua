@@ -5,7 +5,7 @@ local _, ns = ...
 
 ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "New", }, items = {
-		"|cff6e2c0aOpenMap's map inside dungeons can be turned off|r (the OpenMap menu, under Dungeons, and Options): opening the map inside a dungeon put up OpenMap's map of it over any other. Off, the map there is left to the game or another dungeon map addon; the entrances on the world map still open their dungeons' maps.",
+		"|cff6e2c0aDungeon maps|r (the OpenMap menu, under Dungeons, and Options): OpenMap's maps of dungeons can be turned off. They opened over any other, inside a dungeon and from its entrance; off, the map inside a dungeon is left to the game or another addon, and an entrance opens its Dungeon Journal page where there is one.",
 	} },
 	{ version = "v0.8.2", date = "2026-11-08", heads = { [1] = "Improved", [2] = "Fixed", }, items = {
 		"|cff6e2c0aPanning no longer hitches|r: the map set up to 300 textures' files in a single frame where a pan brought new ground into view, and each set is a load and an upload, so that frame showed as a hitch of about 35 ms. It sets 60 a frame now; the art still fades in, a few frames later.",

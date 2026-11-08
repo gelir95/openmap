@@ -21,7 +21,7 @@ d.questSource = "auto"          -- the quests from: "questie", "journal" (Dungeo
 d.entranceClick = "map"         -- clicking an entrance: "map" (its map here) or "journal" (its Dungeon Journal page, where it has one)
 d.dungeonCard = true            -- the card open (false: folded to its title)
 d.dungeonLevels = true          -- each entrance's level range under its icon
-d.dungeonInside = true          -- the map opened inside a dungeon: its map here (false: left to the game or another addon)
+d.dungeonMaps = true            -- OpenMap's maps of dungeons (false: none, inside one or from its entrance; the game's or another addon's instead)
 d.dungeonHints = 0              -- dungeon maps opened with the how-to-leave hint (it shows for the first few)
 d.dungeonTab = "floors"         -- the dungeon map's side panel: floors, bosses, quests or loot
 d.entrances = {}                -- lines /openmap entrance recorded, to paste into build.py
@@ -1061,6 +1061,7 @@ end
 function mod.DungeonViewShown() return view and view:IsShown() or false end
 
 local function NeedRoll() return SlashCmdList and SlashCmdList.NEEDROLL end
+local function Maps() return mod.db.dungeonMaps ~= false end
 
 -- (in combat with the gamepad's UI the game's own map isn't changed by OpenMap: WorldMap.lua's
 -- mod.PadCombat; once a while, said why)
@@ -1106,9 +1107,9 @@ end
 
 local function Open(inst, pin)
 	if chooser then chooser:Hide() end
-	if mod.db.entranceClick == "journal" and OpenJournal(inst) then return end
+	if (mod.db.entranceClick == "journal" or not Maps()) and OpenJournal(inst) then return end
 	local id = DungeonMap(inst)
-	if not id and OpenView(inst, pin) then return end
+	if not id and Maps() and OpenView(inst, pin) then return end
 	if not id then
 		-- no map of it at all (WoW Forever's own dungeons): its card over the world map, and down into
 		-- its entrance (Close.lua), or just closer in
@@ -1192,7 +1193,7 @@ local function Preload(pin)
 end
 
 local function Enter(pin)
-	Preload(pin)
+	if Maps() then Preload(pin) end
 	GameTooltip:SetOwner(pin, "ANCHOR_RIGHT")
 	for _, inst in ipairs(pin.instances) do
 		GameTooltip:AddDoubleLine(S.InstanceName(inst), (Range(inst) or "") .. (inst[3] and ("  " .. L["Raid"]) or ""), 1, 0.82, 0, 1, 1, 1)
@@ -1201,9 +1202,12 @@ local function Enter(pin)
 	local bosses = one and (Places().bosses or {})[one[1]]
 	if bosses and #bosses > 0 then GameTooltip:AddLine(L["%d bosses"]:format(#bosses), 0.8, 0.8, 0.8) end
 	if one then
-		GameTooltip:AddLine((DungeonMap(one) or FloorsOf(one)) and L["Click to open its map"] or L["Click to see what's inside (no map of it yet)"], 0.6, 0.6, 0.6)
+		local says = (DungeonMap(one) or (Maps() and FloorsOf(one))) and L["Click to open its map"]
+			or (Maps() and L["Click to see what's inside (no map of it yet)"]) or L["Click to see what's inside"]
+		if (mod.db.entranceClick == "journal" or not Maps()) and JournalName(one) then says = L["Click to open it in Dungeon Journal"] end
+		GameTooltip:AddLine(says, 0.6, 0.6, 0.6)
 	else
-		GameTooltip:AddLine(L["Click to pick one and open its map"], 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(Maps() and L["Click to pick one and open its map"] or L["Click to pick one"], 0.6, 0.6, 0.6)
 	end
 	GameTooltip:Show()
 end
@@ -1934,6 +1938,8 @@ end
 --------------------------------------------------------------------------------
 
 function mod:DungeonOptions(opts, get, set, off)
+	opts.dungeonMaps = { type = "toggle", name = L["Dungeon maps"], order = 31.07, width = "full", get = get, set = set, disabled = off,
+		desc = L["OpenMap's map of a dungeon, inside it and from its entrance. Off, the map inside a dungeon is left to the game or another addon, and an entrance opens its Dungeon Journal page where there is one."] }
 	opts.dungeonBosses = { type = "toggle", name = L["Dungeon maps: bosses"], order = 31.1, width = "full", get = get, set = set, disabled = off,
 		desc = L["A dungeon's map lists its bosses, in the game's order."] }
 	opts.dungeonLevels = { type = "toggle", name = L["Dungeon level ranges"], order = 31.05, width = "full", get = get, set = set, disabled = off,
@@ -1944,8 +1950,6 @@ function mod:DungeonOptions(opts, get, set, off)
 		values = { auto = L["The first installed"], questie = "Questie", journal = L["Dungeon Journal"], needroll = "NeedRoll" },
 		sorting = { "auto", "questie", "journal", "needroll" },
 		desc = L["Where the Quests tab's quests come from, when you have more than one of these addons. The first installed: Questie, then Dungeon Journal, then NeedRoll."] }
-	opts.dungeonInside = { type = "toggle", name = L["OpenMap's map inside dungeons"], order = 31.27, width = "full", get = get, set = set, disabled = off,
-		desc = L["Opening the map inside a dungeon shows OpenMap's map of it. Off, OpenMap leaves the map to the game or another dungeon map addon there; its entrances still open their maps."] }
 	opts.entranceClick = { type = "select", name = L["Clicking a dungeon entrance opens"], order = 31.3, get = get, set = set, disabled = off,
 		values = { map = L["Its map"], journal = L["Its Dungeon Journal page"] }, sorting = { "map", "journal" },
 		desc = L["With Dungeon Journal installed, an entrance can open that dungeon's page in it instead of its map (its map still opens where Dungeon Journal has no page for it)."] }
@@ -1988,7 +1992,7 @@ local function HoldStep(self)
 end
 function mod.HoldDungeonHere()
 	local files = {}
-	local inst = mod.db.keepWarm ~= false and InstanceHere()
+	local inst = mod.db.keepWarm ~= false and Maps() and InstanceHere()
 	local floors = inst and not DungeonMap(inst) and FloorsOf(inst)
 	for _, f in ipairs(floors or {}) do
 		for _, file in ipairs(f.tiles or {}) do files[#files + 1] = file end
@@ -2062,7 +2066,7 @@ function mod:SetupDungeons(worldMap)
 				end
 				here = info.parentMapID
 			end
-			local inst = mod.db.dungeonInside ~= false and InstanceHere()
+			local inst = Maps() and InstanceHere()
 			if not inst then return end
 			local id = DungeonMap(inst)
 			if not id then OpenView(inst, nil) elseif map:GetMapID() ~= id then S.OpenMap(id) end
