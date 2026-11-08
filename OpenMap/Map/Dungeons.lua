@@ -21,7 +21,7 @@ d.questSource = "auto"          -- the quests from: "questie", "journal" (Dungeo
 d.entranceClick = "map"         -- clicking an entrance: "map" (its map here) or "journal" (its Dungeon Journal page, where it has one)
 d.dungeonCard = true            -- the card open (false: folded to its title)
 d.dungeonLevels = true          -- each entrance's level range under its icon
-d.dungeonMaps = true            -- OpenMap's maps of dungeons (false: none, inside one or from its entrance; the game's or another addon's instead)
+d.dungeonMaps = true            -- OpenMap's maps of dungeons (false: none, inside one or from its entrance; NeedRoll's or Dungeon Journal's instead)
 d.dungeonHints = 0              -- dungeon maps opened with the how-to-leave hint (it shows for the first few)
 d.dungeonTab = "floors"         -- the dungeon map's side panel: floors, bosses, quests or loot
 d.entrances = {}                -- lines /openmap entrance recorded, to paste into build.py
@@ -1062,6 +1062,16 @@ function mod.DungeonViewShown() return view and view:IsShown() or false end
 
 local function NeedRoll() return SlashCmdList and SlashCmdList.NEEDROLL end
 local function Maps() return mod.db.dungeonMaps ~= false end
+-- NeedRoll's map of a dungeon (NeedRoll_ShowMap: its API.md), by its name or its id; false where it has none
+local function NeedRollMap(inst)
+	local show = _G.NeedRoll_ShowMap
+	if type(show) ~= "function" then return false end
+	for _, key in ipairs({ inst[2], inst[1] > 0 and inst[1] or nil }) do
+		local ok, done = pcall(show, key)
+		if ok and done then return true end
+	end
+	return false
+end
 
 -- (in combat with the gamepad's UI the game's own map isn't changed by OpenMap: WorldMap.lua's
 -- mod.PadCombat; once a while, said why)
@@ -1107,7 +1117,9 @@ end
 
 local function Open(inst, pin)
 	if chooser then chooser:Hide() end
-	if (mod.db.entranceClick == "journal" or not Maps()) and OpenJournal(inst) then return end
+	if mod.db.entranceClick == "journal" and OpenJournal(inst) then return end
+	-- (OpenMap's maps off: the dungeon's map in NeedRoll, else its Dungeon Journal page)
+	if not Maps() and (NeedRollMap(inst) or OpenJournal(inst)) then return end
 	local id = DungeonMap(inst)
 	if not id and Maps() and OpenView(inst, pin) then return end
 	if not id then
@@ -1204,7 +1216,8 @@ local function Enter(pin)
 	if one then
 		local says = (DungeonMap(one) or (Maps() and FloorsOf(one))) and L["Click to open its map"]
 			or (Maps() and L["Click to see what's inside (no map of it yet)"]) or L["Click to see what's inside"]
-		if (mod.db.entranceClick == "journal" or not Maps()) and JournalName(one) then says = L["Click to open it in Dungeon Journal"] end
+		if not Maps() and _G.NeedRoll_ShowMap then says = L["Click to open its map in NeedRoll"] end
+		if (mod.db.entranceClick == "journal" or not (Maps() or _G.NeedRoll_ShowMap)) and JournalName(one) then says = L["Click to open it in Dungeon Journal"] end
 		GameTooltip:AddLine(says, 0.6, 0.6, 0.6)
 	else
 		GameTooltip:AddLine(Maps() and L["Click to pick one and open its map"] or L["Click to pick one"], 0.6, 0.6, 0.6)
@@ -1939,7 +1952,7 @@ end
 
 function mod:DungeonOptions(opts, get, set, off)
 	opts.dungeonMaps = { type = "toggle", name = L["Dungeon maps"], order = 31.07, width = "full", get = get, set = set, disabled = off,
-		desc = L["OpenMap's map of a dungeon, inside it and from its entrance. Off, the map inside a dungeon is left to the game or another addon, and an entrance opens its Dungeon Journal page where there is one."] }
+		desc = L["OpenMap's map of a dungeon, inside it and from its entrance. Off, the map inside a dungeon is left to the game or another addon, and an entrance opens its map in NeedRoll, else its Dungeon Journal page, where they have one."] }
 	opts.dungeonBosses = { type = "toggle", name = L["Dungeon maps: bosses"], order = 31.1, width = "full", get = get, set = set, disabled = off,
 		desc = L["A dungeon's map lists its bosses, in the game's order."] }
 	opts.dungeonLevels = { type = "toggle", name = L["Dungeon level ranges"], order = 31.05, width = "full", get = get, set = set, disabled = off,
