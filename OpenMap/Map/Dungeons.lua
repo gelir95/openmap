@@ -21,6 +21,7 @@ d.questSource = "auto"          -- the quests from: "questie", "journal" (Dungeo
 d.entranceClick = "map"         -- clicking an entrance: "map" (its map here) or "journal" (its Dungeon Journal page, where it has one)
 d.dungeonCard = true            -- the card open (false: folded to its title)
 d.dungeonLevels = true          -- each entrance's level range under its icon
+d.dungeonInside = true          -- the map opened inside a dungeon: its map here (false: left to the game or another addon)
 d.dungeonHints = 0              -- dungeon maps opened with the how-to-leave hint (it shows for the first few)
 d.dungeonTab = "floors"         -- the dungeon map's side panel: floors, bosses, quests or loot
 d.entrances = {}                -- lines /openmap entrance recorded, to paste into build.py
@@ -1943,6 +1944,8 @@ function mod:DungeonOptions(opts, get, set, off)
 		values = { auto = L["The first installed"], questie = "Questie", journal = L["Dungeon Journal"], needroll = "NeedRoll" },
 		sorting = { "auto", "questie", "journal", "needroll" },
 		desc = L["Where the Quests tab's quests come from, when you have more than one of these addons. The first installed: Questie, then Dungeon Journal, then NeedRoll."] }
+	opts.dungeonInside = { type = "toggle", name = L["OpenMap's map inside dungeons"], order = 31.27, width = "full", get = get, set = set, disabled = off,
+		desc = L["Opening the map inside a dungeon shows OpenMap's map of it. Off, OpenMap leaves the map to the game or another dungeon map addon there; its entrances still open their maps."] }
 	opts.entranceClick = { type = "select", name = L["Clicking a dungeon entrance opens"], order = 31.3, get = get, set = set, disabled = off,
 		values = { map = L["Its map"], journal = L["Its Dungeon Journal page"] }, sorting = { "map", "journal" },
 		desc = L["With Dungeon Journal installed, an entrance can open that dungeon's page in it instead of its map (its map still opens where Dungeon Journal has no page for it)."] }
@@ -2059,7 +2062,7 @@ function mod:SetupDungeons(worldMap)
 				end
 				here = info.parentMapID
 			end
-			local inst = InstanceHere()
+			local inst = mod.db.dungeonInside ~= false and InstanceHere()
 			if not inst then return end
 			local id = DungeonMap(inst)
 			if not id then OpenView(inst, nil) elseif map:GetMapID() ~= id then S.OpenMap(id) end

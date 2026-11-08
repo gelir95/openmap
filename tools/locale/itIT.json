@@ -91,6 +91,8 @@
  "Draw on this dungeon's map (right-drag pans)": "Disegna sulla mappa di questa spedizione (trascina col destro per spostare)",
  "Only places you've found": "Solo luoghi scoperti",
  "Dungeons, boats and zeppelins only once you've explored where they are, and flight masters only once you've learned them.": "Spedizioni, navi e zeppelin solo dopo aver esplorato la zona in cui si trovano, e maestri di volo solo dopo averli scoperti.",
+ "OpenMap's map inside dungeons": "Mappa di OpenMap nelle spedizioni",
+ "Opening the map inside a dungeon shows OpenMap's map of it. Off, OpenMap leaves the map to the game or another dungeon map addon there; its entrances still open their maps.": "Aprendo la mappa dentro una spedizione, OpenMap ne mostra la mappa. Disattivato, OpenMap lascia la mappa al gioco o a un altro addon di mappe delle spedizioni; i loro ingressi aprono ancora le loro mappe.",
  "The map's menu": "Menu della mappa",
  "Improves performance": "Migliora le prestazioni",
  "Only for this character": "Solo per questo personaggio",

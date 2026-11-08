@@ -91,6 +91,8 @@
  "Draw on this dungeon's map (right-drag pans)": "Auf die Karte dieses Dungeons zeichnen (Rechts ziehen verschiebt)",
  "Only places you've found": "Nur entdeckte Orte",
  "Dungeons, boats and zeppelins only once you've explored where they are, and flight masters only once you've learned them.": "Dungeons, Schiffe und Zeppeline erst, wenn Ihr die Gegend erkundet habt, in der sie liegen, und Flugmeister erst, wenn Ihr sie kennt.",
+ "OpenMap's map inside dungeons": "OpenMap-Karte in Dungeons",
+ "Opening the map inside a dungeon shows OpenMap's map of it. Off, OpenMap leaves the map to the game or another dungeon map addon there; its entrances still open their maps.": "Öffnet Ihr die Karte in einem Dungeon, zeigt OpenMap dessen Karte. Aus: OpenMap überlässt die Karte dort dem Spiel oder einem anderen Dungeonkarten-Addon; die Eingänge öffnen ihre Karten weiterhin.",
  "The map's menu": "Menü der Karte",
  "Improves performance": "Verbessert die Leistung",
  "Only for this character": "Nur für diesen Charakter",

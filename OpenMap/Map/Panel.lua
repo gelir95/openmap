@@ -230,6 +230,7 @@ local function Rows()
 	rows[#rows + 1] = { L["Dungeons"] }
 	rows[#rows + 1] = optRow(L["Level ranges"], "dungeonLevels", Icon("Spell_ChargePositive"))
 	rows[#rows + 1] = optRow(L["Dungeon bosses"], "dungeonBosses", Icon("INV_Misc_Bone_ElfSkull_01"))
+	rows[#rows + 1] = optRow(L["OpenMap's map inside dungeons"], "dungeonInside", Icon("INV_Misc_Map_01"))
 	-- (with Questie, Dungeon Journal or NeedRoll: where they come from is in Options)
 	if mod.DungeonQuestSource and mod.DungeonQuestSource() then
 		rows[#rows + 1] = optRow(L["Dungeon quests"], "dungeonQuests", { texture = "Interface\\GossipFrame\\ActiveQuestIcon" })

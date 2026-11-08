@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### New
+
+- **OpenMap's map inside dungeons can be turned off** (the OpenMap menu, under Dungeons, and
+  Options): opening the map inside a dungeon put up OpenMap's map of it over any other. Off, the
+  map there is left to the game or another dungeon map addon; the entrances on the world map still
+  open their dungeons' maps.
+
 ## v0.8.2 (2026-11-08)
 
 ### Improved
