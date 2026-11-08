@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### New
+
+- **Dungeon maps** (the OpenMap menu, under Dungeons, and Options): OpenMap's maps of dungeons
+  can be turned off. They opened over any other, inside a dungeon and from its entrance; off, the
+  map inside a dungeon is left to the game or another addon, and an entrance opens its map in
+  NeedRoll, else its Dungeon Journal page, where they have one.
+
 ## v0.8.2 (2026-11-08)
 
 ### Improved
